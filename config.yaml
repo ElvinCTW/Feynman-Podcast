@@ -1,0 +1,5 @@
+port: :8080
+ginMode: debug
+mongo:
+  db: test
+  uri: mongodb://localhost:27017
