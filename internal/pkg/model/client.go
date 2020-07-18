@@ -1,6 +1,7 @@
 package model
 
 import (
+	"feynman-podcast/internal/pkg/model/question"
 	"feynman-podcast/internal/pkg/model/user"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -8,7 +9,9 @@ import (
 )
 
 type ModelClient struct {
-	UserDataCollection *user.DataCollection
+	UserDataCollection    *user.DataCollection
+	QuestionCollection    *question.QuestionCollection
+	VoiceAnswerCollection *question.VoiceAnswerCollection
 }
 
 func NewClient(database, uri string) *ModelClient {
@@ -17,7 +20,9 @@ func NewClient(database, uri string) *ModelClient {
 	} else {
 		db := client.Database(database)
 		return &ModelClient{
-			UserDataCollection: user.NewCollection(db.Collection(user.UserData)),
+			UserDataCollection:    user.NewUserDataCollection(db.Collection(user.UserData)),
+			QuestionCollection:    question.NewQuestionCollection(db.Collection(question.QuestionData)),
+			VoiceAnswerCollection: question.NewVoiceAnswerCollection(db.Collection(question.VoiceAnswerData)),
 		}
 	}
 }

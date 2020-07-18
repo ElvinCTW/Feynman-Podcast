@@ -15,7 +15,7 @@ type DataCollection struct {
 	col *mongo.Collection
 }
 
-func NewCollection(collection *mongo.Collection) *DataCollection {
+func NewUserDataCollection(collection *mongo.Collection) *DataCollection {
 	return &DataCollection{
 		col: collection,
 	}
