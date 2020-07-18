@@ -1,10 +1,8 @@
 package question
 
 import (
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const (
@@ -21,30 +19,24 @@ func NewVoiceAnswerCollection(collection *mongo.Collection) *VoiceAnswerCollecti
 	}
 }
 
-func (c *VoiceAnswerCollection) CreateData(va *VoiceAnswer) error {
-	if _, err := c.col.InsertOne(nil, va); err != nil {
-		panic(err)
-	}
-
-	return nil
-}
-
-func (c *VoiceAnswerCollection) CreateComment(voiceAnswerId string, comment *Comment) error {
-	vaObjectId, err := primitive.ObjectIDFromHex(voiceAnswerId)
+func (c *VoiceAnswerCollection) CreateData(questionId, userId, uri string) error {
+	questionObjectId, err := primitive.ObjectIDFromHex(questionId)
 	if err != nil {
 		return err
 	}
 
-	filter := bson.M{"_id": vaObjectId}
-	update := bson.M{
-		"$push": bson.M{
-			"comments": bson.M{
-				"$each": bson.A{comment},
-			},
-		}}
-	noUpsert := options.Update().SetUpsert(false)
+	userObjectId, err := primitive.ObjectIDFromHex(userId)
+	if err != nil {
+		return err
+	}
 
-	if _, err := c.col.UpdateOne(nil, filter, update, noUpsert); err != nil {
+	va := &VoiceAnswer{
+		QuestionId: &questionObjectId,
+		UserId:     &userObjectId,
+		URI:        uri,
+	}
+
+	if _, err := c.col.InsertOne(nil, va); err != nil {
 		panic(err)
 	}
 
@@ -59,11 +51,4 @@ type VoiceAnswer struct {
 	Comments   *[]Comment          `json:"comments" bson:"comments"`
 	Likers     *[]string           `json:"likers" bson:"likers"`
 	LikeCount  int                 `json:"likeCount" bson:"likeCount"`
-}
-
-type Comment struct {
-	Content   string              `json:"content" bson:"content"`
-	UserId    *primitive.ObjectID `json:"userId" bson:"userId" `
-	Likers    *[]string           `json:"likers" bson:"likers"`
-	LikeCount int                 `json:"likeCount" bson:"likeCount"`
 }
