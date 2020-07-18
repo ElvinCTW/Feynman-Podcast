@@ -1,12 +1,10 @@
 package service
 
 import (
-	"sync"
 	"feynman-podcast/internal/pkg/config"
+	"feynman-podcast/internal/pkg/model"
+	"sync"
 )
-
-type Client struct {
-}
 
 var (
 	once   sync.Once
@@ -16,7 +14,13 @@ var (
 func NewClient(c *config.Config) *Client {
 	once.Do(func() {
 		client = &Client{}
+
+		client.ModelClient = model.NewClient(c.Mongo.Database, c.Mongo.URI)
 	})
 
 	return client
+}
+
+type Client struct {
+	*model.ModelClient
 }
