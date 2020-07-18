@@ -1,12 +1,21 @@
 package service
 
-import "feynman-podcast/internal/pkg/model/question"
+import (
+	"fmt"
+	"mime/multipart"
+	"strconv"
+	"time"
+)
 
-func (c *Client) CreateVoiceAnswer(va *question.VoiceAnswer) error {
-	// todo upload file to s3 and get uri
-	return c.VoiceAnswerCollection.CreateData(va)
-}
+func (c *Client) CreateVoiceAnswer(questionId string, userId string, file []*multipart.FileHeader) error {
+	now := strconv.FormatInt(time.Now().UnixNano(), 10)
+	name := fmt.Sprintf("%s-%s-%s", questionId, userId, now)
 
-func (c *Client) CreateComment(voiceAnswerId string, comment *question.Comment) error {
-	return c.VoiceAnswerCollection.CreateComment(voiceAnswerId, comment)
+	if uri, err := c.UploadClient.UploadMp3(file, name); err != nil {
+		return err
+	} else if err = c.VoiceAnswerCollection.CreateData(questionId, userId, *uri); err != nil {
+		return err
+	} else {
+		return nil
+	}
 }
