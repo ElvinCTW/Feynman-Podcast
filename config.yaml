@@ -1,5 +1,10 @@
 port: :8080
 ginMode: debug
 mongo:
-  db: test
-  uri: mongodb://localhost:27017
+  db: fp
+  uri: MONGO_URI
+upload:
+  awsAccessKey: AWS_ACCESS_KEY
+  awsAccessSecret: AWS_ACCESS_SECRET
+  awsRegion: ap-northeast-1
+  awsBucket: tokyo-elvin

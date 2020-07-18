@@ -11,6 +11,7 @@ import (
 func main() {
 	config := config.New()
 	config.ReadYaml()
+	config.ReadEnv()
 	config.Log()
 
 	gin.SetMode(config.GinMode)

@@ -3,7 +3,9 @@ package config
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 
+	"github.com/joho/godotenv"
 	"gopkg.in/yaml.v2"
 )
 
@@ -27,11 +29,24 @@ func (c *Config) ReadYaml() {
 }
 
 func (c *Config) Log() {
-	if b, err := yaml.Marshal(c); err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println(string(b))
+	fmt.Println("port", c.Port)
+	fmt.Println("ginMode", c.GinMode)
+	fmt.Println("mongo database", c.Mongo.Database)
+	fmt.Println("mongo uri", len(c.Mongo.URI))
+	fmt.Println("awsKey", len(c.Upload.AwsAccessKey))
+	fmt.Println("awsSecret", len(c.Upload.AwsAccessSecret))
+	fmt.Println("awsRegion", c.Upload.AwsRegion)
+	fmt.Println("awsBucket", c.Upload.AwsBucket)
+}
+
+func (c *Config) ReadEnv() {
+	if err := godotenv.Load(); err != nil {
+		fmt.Println("not used .env")
 	}
+
+	c.Mongo.URI = os.Getenv(c.Mongo.URI)
+	c.Upload.AwsAccessKey = os.Getenv(c.Upload.AwsAccessKey)
+	c.Upload.AwsAccessSecret = os.Getenv(c.Upload.AwsAccessSecret)
 }
 
 type Config struct {
@@ -41,4 +56,10 @@ type Config struct {
 		Database string `yaml:"db"`
 		URI      string `yaml:"uri"`
 	} `yaml:"mongo"`
+	Upload struct {
+		AwsAccessKey    string `yaml:"awsAccessKey"`
+		AwsAccessSecret string `yaml:"awsAccessSecret"`
+		AwsRegion       string `yaml:"awsRegion"`
+		AwsBucket       string `yaml:"awsBucket"`
+	}
 }

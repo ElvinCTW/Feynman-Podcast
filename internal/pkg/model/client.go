@@ -1,6 +1,7 @@
 package model
 
 import (
+	"context"
 	"feynman-podcast/internal/pkg/model/question"
 	"feynman-podcast/internal/pkg/model/user"
 
@@ -15,7 +16,7 @@ type ModelClient struct {
 }
 
 func NewClient(database, uri string) *ModelClient {
-	if client, err := mongo.NewClient(options.Client().ApplyURI(uri)); err != nil {
+	if client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri)); err != nil {
 		panic(err)
 	} else {
 		db := client.Database(database)
