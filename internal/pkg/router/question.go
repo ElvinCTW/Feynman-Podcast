@@ -9,6 +9,17 @@ import (
 )
 
 func Question(r *gin.Engine, client *service.Client) {
+	r.GET("/question/:qid", func(c *gin.Context) {
+		questionId := c.Param("qid")
+
+		if q := client.GetQuestion(questionId); q == nil {
+			c.String(http.StatusNoContent, http.StatusText(http.StatusNoContent))
+			return
+		} else {
+			c.JSON(http.StatusOK, q)
+		}
+	})
+
 	r.POST("/question", func(c *gin.Context) {
 		data := new(question.Data)
 

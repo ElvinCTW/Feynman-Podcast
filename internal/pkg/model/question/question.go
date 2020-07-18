@@ -1,6 +1,7 @@
 package question
 
 import (
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -25,6 +26,24 @@ func (c *QuestionCollection) CreateData(data *Data) error {
 	}
 
 	return nil
+}
+
+func (c *QuestionCollection) GetData(id string) *Data {
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil
+	}
+
+	filter := bson.M{"_id": objectId}
+
+	data := new(Data)
+	if err := c.col.FindOne(nil, filter).Decode(data); err == mongo.ErrNoDocuments {
+		return nil
+	} else if err != nil {
+		panic(err)
+	}
+
+	return data
 }
 
 type Data struct {
