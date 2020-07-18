@@ -6,6 +6,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	Authorization = "Authorization"
+)
+
 func MainRouter(r *gin.Engine, client *service.Client) {
 	User(r, client)
 
@@ -13,6 +17,7 @@ func MainRouter(r *gin.Engine, client *service.Client) {
 
 	VoiceAnswer(r, client)
 
-	Civil(r, client)
+	Comment(r, client)
 
+	Civil(r, client)
 }
