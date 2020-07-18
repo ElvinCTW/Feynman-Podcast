@@ -14,7 +14,9 @@ func (c *Client) CreateVoiceAnswer(questionId string, userId string, file []*mul
 
 	if uri, err := c.UploadClient.UploadMp3(file, name); err != nil {
 		return err
-	} else if err = c.VoiceAnswerCollection.CreateData(questionId, userId, *uri); err != nil {
+	} else if insertedId, err := c.VoiceAnswerCollection.CreateData(questionId, userId, *uri); err != nil {
+		return err
+	} else if err = c.AddQuestionVoiceAnswer(questionId, *insertedId); err != nil {
 		return err
 	} else {
 		return nil

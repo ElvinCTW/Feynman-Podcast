@@ -4,6 +4,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const (
@@ -46,6 +47,28 @@ func (c *QuestionCollection) GetData(id string) *Data {
 	return data
 }
 
+func (c *QuestionCollection) AddVoiceAnswer(id, VoiceAnswerId string) error {
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+
+	filter := bson.M{"_id": objectId}
+	update := bson.M{
+		"$push": bson.M{
+			"voiceAnswers": bson.M{
+				"$each": bson.A{VoiceAnswerId},
+			},
+		}}
+	noUpsert := options.Update().SetUpsert(false)
+
+	if _, err := c.col.UpdateOne(nil, filter, update, noUpsert); err != nil {
+		panic(err)
+	}
+
+	return nil
+}
+
 type Data struct {
 	Id    *primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
 	Class struct {
@@ -54,8 +77,8 @@ type Data struct {
 	} `json:"class" bson:"class"`
 	Title        string    `json:"title" bson:"title"`
 	Content      string    `json:"content" bson:"content"`
-	Options      *[]Option `json:"options" bson:"options"`
-	VoiceAnswers *[]string `json:"voiceAnswers" bson:"voiceAnswers"`
+	Options      *[]Option `json:"options,omitempty" bson:"options,omitempty"`
+	VoiceAnswers *[]string `json:"voiceAnswers,omitempty" bson:"voiceAnswers,omitempty"`
 }
 
 type Option struct {

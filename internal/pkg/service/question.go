@@ -9,3 +9,7 @@ func (c *Client) CreateQuestion(question *question.Data) error {
 func (c *Client) GetQuestion(questionId string) *question.Data {
 	return c.QuestionCollection.GetData(questionId)
 }
+
+func (c *Client) AddQuestionVoiceAnswer(questionId, voiceAnswerId string) error {
+	return c.QuestionCollection.AddVoiceAnswer(questionId, voiceAnswerId)
+}

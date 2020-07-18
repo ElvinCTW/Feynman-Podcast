@@ -20,15 +20,15 @@ func NewVoiceAnswerCollection(collection *mongo.Collection) *VoiceAnswerCollecti
 	}
 }
 
-func (c *VoiceAnswerCollection) CreateData(questionId, userId, uri string) error {
+func (c *VoiceAnswerCollection) CreateData(questionId, userId, uri string) (*string, error) {
 	questionObjectId, err := primitive.ObjectIDFromHex(questionId)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	userObjectId, err := primitive.ObjectIDFromHex(userId)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	va := &VoiceAnswer{
@@ -37,11 +37,14 @@ func (c *VoiceAnswerCollection) CreateData(questionId, userId, uri string) error
 		URI:        uri,
 	}
 
-	if _, err := c.col.InsertOne(nil, va); err != nil {
+	r, err := c.col.InsertOne(nil, va)
+	if err != nil {
 		panic(err)
 	}
 
-	return nil
+	insertedId := r.InsertedID.(primitive.ObjectID).Hex()
+
+	return &insertedId, nil
 }
 
 func (c *VoiceAnswerCollection) ListData(questionId string) []*VoiceAnswer {
@@ -72,10 +75,10 @@ func (c *VoiceAnswerCollection) ListData(questionId string) []*VoiceAnswer {
 
 type VoiceAnswer struct {
 	Id         *primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
-	QuestionId *primitive.ObjectID `json:"questionId" bson:"questionId"`
-	UserId     *primitive.ObjectID `json:"userId" bson:"userId" `
+	QuestionId *primitive.ObjectID `json:"questionId,omitempty" bson:"questionId,omitempty"`
+	UserId     *primitive.ObjectID `json:"userId,omitempty" bson:"userId,omitempty" `
 	URI        string              `json:"uri" bson:"uri"`
-	Comments   *[]Comment          `json:"comments" bson:"comments"`
-	Likers     *[]string           `json:"likers" bson:"likers"`
+	Comments   *[]Comment          `json:"comments,omitempty" bson:"comments,omitempty"`
+	Likers     *[]string           `json:"likers,omitempty" bson:"likers,omitempty"`
 	LikeCount  int                 `json:"likeCount" bson:"likeCount"`
 }
