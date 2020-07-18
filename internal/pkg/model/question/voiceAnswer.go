@@ -1,6 +1,7 @@
 package question
 
 import (
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -41,6 +42,32 @@ func (c *VoiceAnswerCollection) CreateData(questionId, userId, uri string) error
 	}
 
 	return nil
+}
+
+func (c *VoiceAnswerCollection) ListData(questionId string) []*VoiceAnswer {
+	questionObjectId, err := primitive.ObjectIDFromHex(questionId)
+	if err != nil {
+		return nil
+	}
+
+	filter := bson.M{"questionId": questionObjectId}
+	cur, err := c.col.Find(nil, filter)
+	if err != nil {
+		panic(err)
+	}
+
+	defer cur.Close(nil)
+
+	var list []*VoiceAnswer
+	for cur.TryNext(nil) {
+		va := new(VoiceAnswer)
+		if err := cur.Decode(va); err != nil {
+			continue
+		}
+		list = append(list, va)
+	}
+
+	return list
 }
 
 type VoiceAnswer struct {

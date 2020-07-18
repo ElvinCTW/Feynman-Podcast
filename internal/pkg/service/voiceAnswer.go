@@ -1,6 +1,7 @@
 package service
 
 import (
+	"feynman-podcast/internal/pkg/model/question"
 	"fmt"
 	"mime/multipart"
 	"strconv"
@@ -18,4 +19,8 @@ func (c *Client) CreateVoiceAnswer(questionId string, userId string, file []*mul
 	} else {
 		return nil
 	}
+}
+
+func (c *Client) ListVoiceAnswer(questionId string) []*question.VoiceAnswer {
+	return c.VoiceAnswerCollection.ListData(questionId)
 }

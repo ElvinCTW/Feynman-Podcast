@@ -12,6 +12,17 @@ const (
 )
 
 func VoiceAnswer(r *gin.Engine, client *service.Client) {
+	r.GET("/voiceanswer/question/:qid", func(c *gin.Context) {
+		questionId := c.Param("qid")
+
+		if list := client.ListVoiceAnswer(questionId); list == nil {
+			c.String(http.StatusNoContent, http.StatusText(http.StatusNoContent))
+			return
+		} else {
+			c.JSON(http.StatusOK, list)
+		}
+	})
+
 	r.POST("/voiceanswer/question/:qid", func(c *gin.Context) {
 		questionId := c.Param("qid")
 		userId := c.Request.Header.Get(Authorization)
