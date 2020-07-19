@@ -4,18 +4,16 @@ import (
 	"feynman-podcast/internal/pkg/model/comment"
 )
 
-func (c *Client) CreateComment(answerId string, comment *comment.Data) error {
-	return c.CommentCollection.CreateData(answerId, comment)
+func (c *Client) CreateComment(answerId string, userId string, comment *comment.Data) error {
+	return c.CommentCollection.CreateData(answerId, userId, comment)
 }
 
 func (c *Client) ListComment(awswerId string) *[]comment.Data {
-	// todo
-	return nil
+	return c.CommentCollection.ListData(awswerId)
 }
 
 func (c *Client) UpdateCommentLike(id, likerId string) error {
-	// todo
-	return nil
+	return c.CommentCollection.Updatelike(id, likerId)
 }
 
 func (c *Client) DeleteComment(id string) {
