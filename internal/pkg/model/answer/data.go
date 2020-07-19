@@ -1,4 +1,4 @@
-package question
+package answer
 
 import (
 	"go.mongodb.org/mongo-driver/bson"
@@ -8,20 +8,20 @@ import (
 )
 
 const (
-	VoiceAnswerData = "voiceAnswerData"
+	AnswerData = "answerData"
 )
 
-type VoiceAnswerCollection struct {
+type DataCollection struct {
 	col *mongo.Collection
 }
 
-func NewVoiceAnswerCollection(collection *mongo.Collection) *VoiceAnswerCollection {
-	return &VoiceAnswerCollection{
+func NewDataCollection(collection *mongo.Collection) *DataCollection {
+	return &DataCollection{
 		col: collection,
 	}
 }
 
-func (c *VoiceAnswerCollection) CreateData(questionId, userId, uri string) (*string, error) {
+func (c *DataCollection) CreateData(questionId, userId, uri string) (*string, error) {
 	questionObjectId, err := primitive.ObjectIDFromHex(questionId)
 	if err != nil {
 		return nil, err
@@ -32,13 +32,11 @@ func (c *VoiceAnswerCollection) CreateData(questionId, userId, uri string) (*str
 		return nil, err
 	}
 
-	comment := make([]Comment, 0)
 	likers := make([]string, 0)
-	va := &VoiceAnswer{
+	va := &Data{
 		QuestionId: &questionObjectId,
 		UserId:     &userObjectId,
 		URI:        uri,
-		Comments:   &comment,
 		Likers:     &likers,
 	}
 
@@ -52,13 +50,13 @@ func (c *VoiceAnswerCollection) CreateData(questionId, userId, uri string) (*str
 	return &insertedId, nil
 }
 
-func (c *VoiceAnswerCollection) GetData(id string) *VoiceAnswer {
+func (c *DataCollection) GetData(id string) *Data {
 	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil
 	}
 
-	data := new(VoiceAnswer)
+	data := new(Data)
 	filter := bson.M{"_id": objectId}
 	if err = c.col.FindOne(nil, filter).Decode(data); err == mongo.ErrNoDocuments {
 		return nil
@@ -69,7 +67,7 @@ func (c *VoiceAnswerCollection) GetData(id string) *VoiceAnswer {
 	return data
 }
 
-func (c *VoiceAnswerCollection) ListData(questionId string) *[]VoiceAnswer {
+func (c *DataCollection) ListData(questionId string) *[]Data {
 	questionObjectId, err := primitive.ObjectIDFromHex(questionId)
 	if err != nil {
 		return nil
@@ -83,7 +81,7 @@ func (c *VoiceAnswerCollection) ListData(questionId string) *[]VoiceAnswer {
 
 	defer cur.Close(nil)
 
-	list := make([]VoiceAnswer, 0)
+	list := make([]Data, 0)
 	if err = cur.All(nil, &list); err != nil {
 		panic(err)
 	}
@@ -91,8 +89,8 @@ func (c *VoiceAnswerCollection) ListData(questionId string) *[]VoiceAnswer {
 	return &list
 }
 
-// call this function after confirm answer exist with get VoiceAnswer()
-func (c *VoiceAnswerCollection) Updatelike(id, likerId string) error {
+// call this function after confirm answer exist with get Data()
+func (c *DataCollection) Updatelike(id, likerId string) error {
 	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return err
@@ -120,12 +118,11 @@ func (c *VoiceAnswerCollection) Updatelike(id, likerId string) error {
 	return nil
 }
 
-type VoiceAnswer struct {
+type Data struct {
 	Id         *primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
 	QuestionId *primitive.ObjectID `json:"questionId" bson:"questionId"`
 	UserId     *primitive.ObjectID `json:"userId" bson:"userId" `
 	URI        string              `json:"uri" bson:"uri"`
-	Comments   *[]Comment          `json:"comments" bson:"comments"`
 	Likers     *[]string           `json:"likers" bson:"likers"`
 	LikeCount  int                 `json:"likeCount" bson:"likeCount"`
 }

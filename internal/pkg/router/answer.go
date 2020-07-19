@@ -8,14 +8,14 @@ import (
 )
 
 const (
-	voiceAnswer = "voiceAnswer"
+	answer = "answer"
 )
 
-func VoiceAnswer(r *gin.Engine, client *service.Client) {
-	r.GET("/voiceanswer/question/:qid", func(c *gin.Context) {
+func Answer(r *gin.Engine, client *service.Client) {
+	r.GET("/answer/question/:qid", func(c *gin.Context) {
 		questionId := c.Param("qid")
 
-		if list := client.ListVoiceAnswer(questionId); len(*list) == 0 {
+		if list := client.ListAnswer(questionId); len(*list) == 0 {
 			c.String(http.StatusNoContent, http.StatusText(http.StatusNoContent))
 			return
 		} else {
@@ -23,14 +23,14 @@ func VoiceAnswer(r *gin.Engine, client *service.Client) {
 		}
 	})
 
-	r.POST("/voiceanswer/question/:qid", func(c *gin.Context) {
+	r.POST("/answer/question/:qid", func(c *gin.Context) {
 		questionId := c.Param("qid")
 		userId := c.Request.Header.Get(Authorization)
 
 		if form, err := c.MultipartForm(); err != nil {
 			c.String(http.StatusBadRequest, err.Error())
 			return
-		} else if err := client.CreateVoiceAnswer(questionId, userId, form.File[voiceAnswer]); err != nil {
+		} else if err := client.CreateAnswer(questionId, userId, form.File[answer]); err != nil {
 			c.String(http.StatusBadRequest, err.Error())
 			return
 		} else {
@@ -38,11 +38,11 @@ func VoiceAnswer(r *gin.Engine, client *service.Client) {
 		}
 	})
 
-	r.PUT("/voiceanswer/:vid/like", func(c *gin.Context) {
-		voiceAnswerId := c.Param("vid")
+	r.PUT("/answer/:aid/like", func(c *gin.Context) {
+		answerId := c.Param("aid")
 
 		userId := c.Request.Header.Get(Authorization)
-		if err := client.UpdateVoiceAnswerLike(voiceAnswerId, userId); err != nil {
+		if err := client.UpdateAnswerLike(answerId, userId); err != nil {
 			c.String(http.StatusBadRequest, err.Error())
 			return
 		} else {

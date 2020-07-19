@@ -15,7 +15,7 @@ func MainRouter(r *gin.Engine, client *service.Client) {
 
 	Question(r, client)
 
-	VoiceAnswer(r, client)
+	Answer(r, client)
 
 	Comment(r, client)
 

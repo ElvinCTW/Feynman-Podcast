@@ -2,6 +2,8 @@ package model
 
 import (
 	"context"
+	"feynman-podcast/internal/pkg/model/answer"
+	"feynman-podcast/internal/pkg/model/comment"
 	"feynman-podcast/internal/pkg/model/question"
 	"feynman-podcast/internal/pkg/model/user"
 
@@ -10,9 +12,10 @@ import (
 )
 
 type ModelClient struct {
-	UserDataCollection    *user.DataCollection
-	QuestionCollection    *question.QuestionCollection
-	VoiceAnswerCollection *question.VoiceAnswerCollection
+	UserDataCollection *user.DataCollection
+	QuestionCollection *question.DataCollection
+	AnswerCollection   *answer.DataCollection
+	CommentCollection  *comment.DataCollection
 }
 
 func NewClient(database, uri string) *ModelClient {
@@ -21,9 +24,10 @@ func NewClient(database, uri string) *ModelClient {
 	} else {
 		db := client.Database(database)
 		return &ModelClient{
-			UserDataCollection:    user.NewUserDataCollection(db.Collection(user.UserData)),
-			QuestionCollection:    question.NewQuestionCollection(db.Collection(question.QuestionData)),
-			VoiceAnswerCollection: question.NewVoiceAnswerCollection(db.Collection(question.VoiceAnswerData)),
+			UserDataCollection: user.NewUserDataCollection(db.Collection(user.UserData)),
+			QuestionCollection: question.NewDataCollection(db.Collection(question.QuestionData)),
+			AnswerCollection:   answer.NewDataCollection(db.Collection(answer.AnswerData)),
+			CommentCollection:  comment.NewDataCollection(db.Collection(comment.CommentData)),
 		}
 	}
 }
