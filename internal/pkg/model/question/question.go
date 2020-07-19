@@ -22,7 +22,17 @@ func NewQuestionCollection(collection *mongo.Collection) *QuestionCollection {
 }
 
 func (c *QuestionCollection) CreateData(data *Data) error {
-	if _, err := c.col.InsertOne(nil, data); err != nil {
+	s := make([]string, 0)
+
+	d := &Data{
+		Class:        data.Class,
+		Title:        data.Title,
+		Content:      data.Content,
+		Options:      data.Options,
+		VoiceAnswers: &s,
+	}
+
+	if _, err := c.col.InsertOne(nil, d); err != nil {
 		panic(err)
 	}
 
@@ -74,11 +84,11 @@ type Data struct {
 	Class struct {
 		TestType string `json:"testType" bson:"testType"`
 		Domain   string `json:"domain" bson:"domain"`
-	} `json:"class" bson:"class"`
+	} `json:"class,inline" bson:"class,inline"`
 	Title        string    `json:"title" bson:"title"`
 	Content      string    `json:"content" bson:"content"`
-	Options      *[]Option `json:"options,omitempty" bson:"options,omitempty"`
-	VoiceAnswers *[]string `json:"voiceAnswers,omitempty" bson:"voiceAnswers,omitempty"`
+	Options      *[]Option `json:"options" bson:"options"`
+	VoiceAnswers *[]string `json:"voiceAnswers" bson:"voiceAnswers"`
 }
 
 type Option struct {

@@ -15,7 +15,7 @@ func VoiceAnswer(r *gin.Engine, client *service.Client) {
 	r.GET("/voiceanswer/question/:qid", func(c *gin.Context) {
 		questionId := c.Param("qid")
 
-		if list := client.ListVoiceAnswer(questionId); list == nil {
+		if list := client.ListVoiceAnswer(questionId); len(*list) == 0 {
 			c.String(http.StatusNoContent, http.StatusText(http.StatusNoContent))
 			return
 		} else {

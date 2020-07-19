@@ -23,6 +23,6 @@ func (c *Client) CreateVoiceAnswer(questionId string, userId string, file []*mul
 	}
 }
 
-func (c *Client) ListVoiceAnswer(questionId string) []*question.VoiceAnswer {
+func (c *Client) ListVoiceAnswer(questionId string) *[]question.VoiceAnswer {
 	return c.VoiceAnswerCollection.ListData(questionId)
 }
