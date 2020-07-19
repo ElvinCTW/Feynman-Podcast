@@ -36,3 +36,7 @@ func (c *Client) UpdateAnswerLike(id, likerId string) error {
 	}
 	return c.AnswerCollection.Updatelike(id, likerId)
 }
+
+func (c *Client) DeleteAnswer(id string) {
+	// todo
+}
