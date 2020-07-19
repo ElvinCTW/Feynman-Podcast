@@ -4,6 +4,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const (
@@ -51,6 +52,23 @@ func (c *VoiceAnswerCollection) CreateData(questionId, userId, uri string) (*str
 	return &insertedId, nil
 }
 
+func (c *VoiceAnswerCollection) GetData(id string) *VoiceAnswer {
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil
+	}
+
+	data := new(VoiceAnswer)
+	filter := bson.M{"_id": objectId}
+	if err = c.col.FindOne(nil, filter).Decode(data); err == mongo.ErrNoDocuments {
+		return nil
+	} else if err != nil {
+		panic(err)
+	}
+
+	return data
+}
+
 func (c *VoiceAnswerCollection) ListData(questionId string) *[]VoiceAnswer {
 	questionObjectId, err := primitive.ObjectIDFromHex(questionId)
 	if err != nil {
@@ -71,6 +89,35 @@ func (c *VoiceAnswerCollection) ListData(questionId string) *[]VoiceAnswer {
 	}
 
 	return &list
+}
+
+// call this function after confirm answer exist with get VoiceAnswer()
+func (c *VoiceAnswerCollection) Updatelike(id, likerId string) error {
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+
+	// check user in likers or not
+	filter := bson.M{"_id": objectId, "likers": bson.M{"$in": bson.A{likerId}}}
+	r := c.col.FindOne(nil, filter, options.FindOne().SetProjection(bson.M{"_id": 1}))
+	if r.Err() != nil && r.Err() != mongo.ErrNoDocuments {
+		panic(err)
+	}
+
+	// update likers and like
+	filter = bson.M{"_id": objectId}
+	noUpsert := options.Update().SetUpsert(false)
+	update := bson.M{"$inc": bson.M{"likeCount": -1}, "$pull": bson.M{"likers": likerId}}
+	if r.Err() == mongo.ErrNoDocuments {
+		update = bson.M{"$inc": bson.M{"likeCount": 1}, "$addToSet": bson.M{"likers": likerId}}
+	}
+
+	if _, err := c.col.UpdateOne(nil, filter, update, noUpsert); err != nil {
+		panic(err)
+	}
+
+	return nil
 }
 
 type VoiceAnswer struct {

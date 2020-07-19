@@ -1,6 +1,7 @@
 package service
 
 import (
+	"feynman-podcast/internal/pkg/fperr"
 	"feynman-podcast/internal/pkg/model/question"
 	"fmt"
 	"mime/multipart"
@@ -23,6 +24,17 @@ func (c *Client) CreateVoiceAnswer(questionId string, userId string, file []*mul
 	}
 }
 
+func (c *Client) GetVoiceAnswer(id string) *question.VoiceAnswer {
+	return c.VoiceAnswerCollection.GetData(id)
+}
+
 func (c *Client) ListVoiceAnswer(questionId string) *[]question.VoiceAnswer {
 	return c.VoiceAnswerCollection.ListData(questionId)
+}
+
+func (c *Client) UpdateVoiceAnswerLike(id, likerId string) error {
+	if va := c.GetVoiceAnswer(id); va == nil {
+		return fperr.New(fperr.NoContent)
+	}
+	return c.VoiceAnswerCollection.Updatelike(id, likerId)
 }
