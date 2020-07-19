@@ -106,3 +106,20 @@ func (c *DataCollection) Updatelike(id, likerId string) error {
 
 	return nil
 }
+
+func (c *DataCollection) DeleteData(id, userId string) {
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return
+	}
+
+	userObjectId, err := primitive.ObjectIDFromHex(userId)
+	if err != nil {
+		return
+	}
+
+	filter := bson.M{"_id": objectId, "userId": userObjectId}
+	if _, err := c.col.DeleteOne(nil, filter); err != nil {
+		panic(err)
+	}
+}

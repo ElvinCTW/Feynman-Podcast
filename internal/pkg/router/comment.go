@@ -47,4 +47,12 @@ func Comment(r *gin.Engine, client *service.Client) {
 			c.String(http.StatusOK, http.StatusText(http.StatusOK))
 		}
 	})
+
+	r.DELETE("/comment/:cid", func(c *gin.Context) {
+		commentId := c.Param("cid")
+
+		userId := c.Request.Header.Get(Authorization)
+		client.DeleteComment(commentId, userId)
+		c.String(http.StatusOK, http.StatusText(http.StatusOK))
+	})
 }

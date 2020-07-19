@@ -16,6 +16,6 @@ func (c *Client) UpdateCommentLike(id, likerId string) error {
 	return c.CommentCollection.Updatelike(id, likerId)
 }
 
-func (c *Client) DeleteComment(id string) {
-	// todo
+func (c *Client) DeleteComment(id, userId string) {
+	c.CommentCollection.DeleteData(id, userId)
 }
