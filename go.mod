@@ -3,6 +3,7 @@ module feynman-podcast
 go 1.14
 
 require (
+	firebase.google.com/go/v4 v4.1.0
 	code.sajari.com/docconv v1.1.0
 	github.com/JalfResi/justext v0.0.0-20170829062021-c0282dea7198 // indirect
 	github.com/advancedlogic/GoOse v0.0.0-20191112112754-e742535969c1 // indirect
@@ -13,5 +14,6 @@ require (
 	github.com/unidoc/unipdf/v3 v3.9.0
 	go.mongodb.org/mongo-driver v1.3.5
 	golang.org/x/crypto v0.0.0-20200709230013-948cd5f35899
+	google.golang.org/api v0.17.0
 	gopkg.in/yaml.v2 v2.3.0
 )
