@@ -2,8 +2,10 @@ package service
 
 import (
 	"feynman-podcast/internal/pkg/config"
+	"feynman-podcast/internal/pkg/crawler"
 	"feynman-podcast/internal/pkg/model"
 	"feynman-podcast/internal/pkg/upload"
+	"net/http"
 	"sync"
 )
 
@@ -14,9 +16,11 @@ var (
 
 func NewClient(c *config.Config) *Client {
 	once.Do(func() {
+		httpClient := &http.Client{}
 		client = &Client{
-			ModelClient:  model.NewClient(c.Mongo.Database, c.Mongo.URI),
-			UploadClient: upload.NewClient(c.Upload.AwsAccessKey, c.Upload.AwsAccessSecret, c.Upload.AwsRegion, c.Upload.AwsBucket),
+			ModelClient:   model.NewClient(c.Mongo.Database, c.Mongo.URI),
+			UploadClient:  upload.NewClient(c.Upload.AwsAccessKey, c.Upload.AwsAccessSecret, c.Upload.AwsRegion, c.Upload.AwsBucket),
+			CrawlerClient: crawler.NewClient(httpClient),
 		}
 	})
 
@@ -25,5 +29,6 @@ func NewClient(c *config.Config) *Client {
 
 type Client struct {
 	*model.ModelClient
-	UploadClient *upload.Client
+	UploadClient  *upload.Client
+	CrawlerClient *crawler.Client
 }
