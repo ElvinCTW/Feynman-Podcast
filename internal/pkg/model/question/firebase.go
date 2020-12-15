@@ -15,13 +15,13 @@ const (
 )
 
 type Question struct {
-	Id    string `json:"id,omitempty" bson:"_id,omitempty"`
+	Id    string `json:"id,omitempty"`
 	Class struct {
-		TestType string `json:"testType" bson:"testType"`
-		Domain   string `json:"domain" bson:"domain"`
-	} `json:"class,inline" bson:"class,inline"`
-	Title   string `json:"title" bson:"title"`
-	Content string `json:"content" bson:"content"`
+		TestType string `json:"testType"`
+		Domain   string `json:"domain"`
+	} `json:"class,inline"`
+	Title   string `json:"title"`
+	Content string `json:"content"`
 	//Options *[]Option `json:"options" bson:"options"`
 }
 
@@ -35,19 +35,30 @@ func NewQuestionCollection(col *firestore.CollectionRef) *QuestionCollection {
 	return &QuestionCollection{col: col}
 }
 
-func (c *QuestionCollection) CreateQuestion(domain, title, content string) error {
+func (c *QuestionCollection) CreateQuestion(q *Question) (*string, error) {
 	ctx := context.Background()
-	q := InsertData{
-		Domain:  domain,
-		Title:   title,
-		Content: content,
-	}
 
-	_, _, err := c.col.Add(ctx, q)
+	doc := c.col.NewDoc()
+	_, err := doc.Set(ctx, q)
 	if err != nil {
 		log.Fatalf("Failed adding alovelace: %v", err)
-		return err
+		return nil, err
 	}
 
-	return nil
+	return &doc.ID, nil
+}
+
+func (c *QuestionCollection) GetQuestion(id string) *Question {
+	ctx := context.Background()
+	dsnap, err := c.col.Doc(id).Get(ctx)
+	if err != nil {
+		return nil
+	}
+
+	q := new(Question)
+	if err := dsnap.DataTo(q); err != nil {
+		log.Fatalf("Failed adding alovelace: %v", err)
+	}
+	q.Id = dsnap.Ref.ID
+	return q
 }

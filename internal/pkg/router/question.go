@@ -9,16 +9,16 @@ import (
 )
 
 func Question(r *gin.Engine, client *service.Client) {
-	//r.GET("/question/:qid", func(c *gin.Context) {
-	//	questionId := c.Param("qid")
-	//
-	//	if q := client.GetQuestion(questionId); q == nil {
-	//		c.String(http.StatusNoContent, http.StatusText(http.StatusNoContent))
-	//		return
-	//	} else {
-	//		c.JSON(http.StatusOK, q)
-	//	}
-	//})
+	r.GET("/question/:qid", func(c *gin.Context) {
+		questionId := c.Param("qid")
+
+		if q := client.GetQuestion(questionId); q == nil {
+			c.String(http.StatusNoContent, http.StatusText(http.StatusNoContent))
+			return
+		} else {
+			c.JSON(http.StatusOK, q)
+		}
+	})
 
 	r.POST("/question", func(c *gin.Context) {
 		data := new(question.Question)
@@ -26,11 +26,11 @@ func Question(r *gin.Engine, client *service.Client) {
 		if err := c.BindJSON(data); err != nil {
 			c.String(http.StatusBadRequest, err.Error())
 			return
-		} else if err := client.CreateQuestion(data); err != nil {
+		} else if id, err := client.CreateQuestion(data); err != nil {
 			c.String(http.StatusBadRequest, err.Error())
 			return
 		} else {
-			c.String(http.StatusOK, http.StatusText(http.StatusOK))
+			c.String(http.StatusOK, *id)
 		}
 	})
 }
