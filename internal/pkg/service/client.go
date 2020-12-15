@@ -42,7 +42,8 @@ func NewClient(c *config.Config) *Client {
 
 type Client struct {
 	*model.ModelClient
-	UploadClient  *upload.Client
+	*model.FireStoreClient
+	UploadClient *upload.Client
 	CrawlerClient *crawler.Client
 	App          *firebase.App
 }
