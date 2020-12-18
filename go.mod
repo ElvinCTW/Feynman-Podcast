@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	cloud.google.com/go/firestore v1.1.1
+	cloud.google.com/go/storage v1.0.0
 	firebase.google.com/go/v4 v4.1.0
 	code.sajari.com/docconv v1.1.0
 	github.com/JalfResi/justext v0.0.0-20170829062021-c0282dea7198 // indirect

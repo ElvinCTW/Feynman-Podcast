@@ -22,7 +22,11 @@ func NewClient(c *config.Config) *Client {
 	once.Do(func() {
 		httpClient := &http.Client{}
 		opt := option.WithCredentialsFile("test-helper-key.json")
-		app, err := firebase.NewApp(context.Background(), nil, opt)
+		config := &firebase.Config{
+			StorageBucket: "gs://sapient-torch-298615.appspot.com",
+		}
+
+		app, err := firebase.NewApp(context.Background(), config, opt)
 		if err != nil {
 			fmt.Println("unable to init app engine")
 		}
@@ -30,8 +34,9 @@ func NewClient(c *config.Config) *Client {
 		fmt.Println(app)
 
 		client = &Client{
-			ModelClient:   model.NewClient(c.Mongo.Database, c.Mongo.URI),
-			UploadClient:  upload.NewClient(c.Upload.AwsAccessKey, c.Upload.AwsAccessSecret, c.Upload.AwsRegion, c.Upload.AwsBucket),
+			//ModelClient:     model.NewClient(c.Mongo.Database, c.Mongo.URI),
+			FireStoreClient: model.NewFireStore(app),
+			UploadClient:    upload.NewStorage(app),
 			CrawlerClient: crawler.NewClient(httpClient),
 			App:          app,
 		}
@@ -41,9 +46,9 @@ func NewClient(c *config.Config) *Client {
 }
 
 type Client struct {
-	*model.ModelClient
+	//*model.ModelClient
 	*model.FireStoreClient
-	UploadClient *upload.Client
+	UploadClient *upload.StorageClient
 	CrawlerClient *crawler.Client
 	App          *firebase.App
 }
