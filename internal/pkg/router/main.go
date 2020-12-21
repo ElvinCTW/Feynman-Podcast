@@ -19,5 +19,5 @@ func MainRouter(r *gin.Engine, client *service.Client) {
 
 	Comment(r, client)
 
-	Civil(r, client)
+	//Civil(r, client)
 }
